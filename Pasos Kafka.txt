@@ -1,0 +1,58 @@
+FUNCIONA: Ejecutarlo desde PowerShell sin permisos de administrador
+
+1.- Arrancar zookeper:
+	bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+	C:\Kafka>bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+
+	En MAC, Importante!! con permisos de administrador:
+	bin % ./zookeeper-server-start.sh ../config/zookeeper.properties
+
+2.- Arrancar un broker de Apache Kafka:
+	bin\windows\kafka-server-start.bat config\server.properties
+	C:\Kafka>bin\windows\kafka-server-start.bat config\server.properties
+
+	En MAC:
+	bin % ./kafka-server-start.sh ../config/server.properties
+
+3.- Ahora queremos crear un cluster, como ya tenemos arrancado un broker de kafka,
+	vamos a crear y arrancar otros 2
+	duplicamos config/server.properties a server1.properties y cambiamos estas propiedades:
+		broker.id=1
+		listeners=PLAINTEXT://:9093    lo descomentamos
+		log.dirs=/tmp/kafka-logs-1
+
+	duplicamos config/server.properties a server2.properties y cambiamos estas propiedades:
+		broker.id=2
+		listeners=PLAINTEXT://:9094    lo descomentamos
+		log.dirs=/tmp/kafka-logs-2
+
+	Levantamos los 2 nuevos brokers:	
+	bin\windows\kafka-server-start.bat config\server1.properties
+	bin\windows\kafka-server-start.bat config\server2.properties
+
+	En MAC:
+	bin % ./kafka-server-start.sh ../config/server1.properties
+	bin % ./kafka-server-start.sh ../config/server2.properties
+
+4.- Crear un topic con 2 particiones y factor de replicacion 3 llamado indra-cluster
+	bin\windows\kafka-topics.bat --create --topic indra-cluster --bootstrap-server localhost:9092 --replication-factor 3 --partitions 2
+
+	En MAC:
+	bin % ./kafka-topics.sh --create --topic indra-cluster --bootstrap-server localhost:9092 --replication-factor 3 --partitions 2
+
+
+5.- Crear un productor de mensajes
+	bin\windows\kafka-console-producer.bat --topic indra-cluster --bootstrap-server localhost:9092
+
+	En MAC:
+	bin % ./kafka-console-producer.sh --topic indra-cluster --bootstrap-server localhost:9092
+
+6.- Crear un consumidor de mensajes
+	bin\windows\kafka-console-consumer.bat --topic indra-cluster --from-beginning --bootstrap-server localhost:9092
+
+	En MAC:
+	bin % ./kafka-console-consumer.sh --topic indra-cluster --from-beginning --bootstrap-server localhost:9092
+
+
+
+
